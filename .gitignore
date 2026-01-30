@@ -1,0 +1,11 @@
+
+# Python virtual environment
+venv/
+env/
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+package-lock.json
