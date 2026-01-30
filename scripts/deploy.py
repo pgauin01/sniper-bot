@@ -48,7 +48,7 @@ abi = compiled_sol["contracts"]["Sniper.sol"]["Sniper"]["abi"]
 
 # 4. CONNECT: Connect to Ganache
 # Ganache usually runs on 127.0.0.1:8545
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
+w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
 
 # Check connection
 if w3.is_connected():
