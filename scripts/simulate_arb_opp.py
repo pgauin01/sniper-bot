@@ -45,18 +45,21 @@ if whale_eth < w3.to_wei(1, 'ether'):
     print("✅ Gas Sent.")
 
 # --- STEP 2: EXECUTE DUMP ---
-print("\n💥 Whale is buying $10,000,000 worth of WETH on Uniswap...")
+print("\n💥 Whale is buying USDC -> WETH on Uniswap...")
 
 try:
     # Check USDC Balance
     usdc_bal = usdc_token.functions.balanceOf(WHALE).call()
     print(f"💰 Whale USDC Balance: ${usdc_bal / 1e6:,.2f}")
-    
-    AMOUNT_TO_TRADE = 9_000_000 * 10**6 
-    
-    if usdc_bal < AMOUNT_TO_TRADE:
-        print(f"❌ Error: Whale is broke! Check Ganache.")
+    DESIRED_TRADE = 9_000_000 * 10**6
+    AMOUNT_TO_TRADE = min(DESIRED_TRADE, int(usdc_bal * 0.95))
+
+    if AMOUNT_TO_TRADE <= 0:
+        print("??? Error: Whale has no USDC to trade.")
         exit()
+
+    print(f"Using trade amount: ${AMOUNT_TO_TRADE / 1e6:,.2f} USDC")
+
 
     # Approve
     usdc_token.functions.approve(UNISWAP_ROUTER, 2**256 - 1).transact({"from": WHALE})
