@@ -1,4 +1,10 @@
+import json
+import os
+from web3 import Web3
+from solcx import compile_standard, install_solc
 
+# 1. THE PROVEN "GOLDEN CODE" (Embedded directly in Python to avoid file errors)
+SOLIDITY_CODE = """
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -75,3 +81,38 @@ contract ArbSniper is Ownable {
         IERC20(USDC).transfer(pair, amountToRepay);
     }
 }
+"""
+
+def force_deploy():
+    # 2. OVERWRITE THE FILE
+    print("✍️  Overwriting ArbSniper.sol with CORRECT code...")
+    with open("contracts/ArbSniper.sol", "w") as f:
+        f.write(SOLIDITY_CODE)
+
+    # 3. COMPILE & DEPLOY
+    install_solc("0.8.0")
+    w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+    
+    compiled_sol = compile_standard({
+        "language": "Solidity",
+        "sources": {"ArbSniper.sol": {"content": SOLIDITY_CODE}},
+        "settings": {"outputSelection": {"*": {"*": ["abi", "evm.bytecode"]}}}
+    }, solc_version="0.8.0")
+
+    bytecode = compiled_sol["contracts"]["ArbSniper.sol"]["ArbSniper"]["evm"]["bytecode"]["object"]
+    abi = compiled_sol["contracts"]["ArbSniper.sol"]["ArbSniper"]["abi"]
+
+    deployer = w3.eth.accounts[0]
+    ArbSniper = w3.eth.contract(abi=abi, bytecode=bytecode)
+    
+    print("🚀 Deploying NEW Contract...")
+    tx_hash = ArbSniper.constructor().transact({"from": deployer})
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    
+    print(f"✅ DEPLOYED AT: {tx_receipt.contractAddress}")
+    
+    with open("arb_deployment.json", "w") as f:
+        json.dump({"address": tx_receipt.contractAddress, "abi": abi}, f)
+
+if __name__ == "__main__":
+    force_deploy()
