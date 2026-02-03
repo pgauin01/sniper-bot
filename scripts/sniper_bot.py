@@ -82,6 +82,11 @@ def handle_event(tx, tx_input_str):
         })
         print(f"✅ Snipe Sent! Tx: {snipe_tx.hex()}")
 
+        with open("sniped_tokens.txt", "a") as f:
+            f.write(token_address + "\n")
+        bought_tokens.add(token_address)
+        print(f"💾 Saved {token_address} to database.")
+
         # --- NEW: SMART SELL LOGIC ---
         print("📉 Entering Position Manager (Take Profit: +20% | Stop Loss: -10%)")
         
@@ -141,10 +146,6 @@ def handle_event(tx, tx_input_str):
             print(f"❌ Sell Failed: {e}")
         # ----------------------------
 
-        with open("sniped_tokens.txt", "a") as f:
-            f.write(token_address + "\n")
-        bought_tokens.add(token_address)
-        return True
         
     except Exception as e:
         print(f"❌ Error: {e}")

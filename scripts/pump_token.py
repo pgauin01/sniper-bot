@@ -47,7 +47,7 @@ router = w3.eth.contract(address=router_address, abi=router_abi)
 WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 
 # 5. EXECUTE PUMP
-amount_to_pump = 20  # Buy with 20 ETH (Massive buy for a small pool)
+amount_to_pump = 2  # Buy with 20 ETH (Massive buy for a small pool)
 
 print(f"\n🚀 PUMPING {amount_to_pump} ETH into the chart...")
 
